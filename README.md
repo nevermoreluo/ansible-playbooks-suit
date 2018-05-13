@@ -12,8 +12,6 @@ laxzl01 domain=laxzl01.expamle.io ansible_host=xxx.xxx.xxx.xxx
 `Note: It will auto install python2, if not exists.`
 
 
-
-
 ## Road map
 Just an ansible playbooks deploy base monitor for my all vps
 
@@ -59,7 +57,25 @@ apt-get install \
    $(lsb_release -cs) \
    stable" && apt update && apt-get install docker-ce -y
    
-docker run --name yj_pushgateway -d -p 9091:9091 prom/pushgateway
+docker run --name pushgateway -d -p 9091:9091 prom/pushgateway
 docker run --name prometheus -d -p 9090:9090 -v /data/prometheus:/prometheus-data  prom/prometheus --config.file=/prometheus-data/config.yml
 docker run --name alertmanager -d -p 9093:9093 -v /data/prometheus:/prometheus-data  prom/alertmanager --config.file=/prometheus-data/alertmanager_config.yml
 ```
+
+
+```test
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+worker_rlimit_nofile 1048576;
+
+
+# Load dynamic modules. See /usr/share/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 10240;
+}
+```
+

@@ -1,0 +1,63 @@
+# /etc/nginx/sites-available/default
+
+upstream backend {
+  server xxx.xxx.xxx.xxx:443;
+}
+
+server {
+    listen 443 ssl;
+    server_name api.example.io;
+
+    # ssl_certificate           /etc/nginx/cert.crt;
+    # ssl_certificate_key       /etc/nginx/cert.key;
+
+    #ssl on;
+    #ssl_session_cache  builtin:1000  shared:SSL:10m;
+    ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
+    #ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+    #ssl_prefer_server_ciphers on;
+
+    access_log            /var/log/nginx/api.yuanjin.io.access.log;
+
+    location / {
+
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+
+      # Fix the "It appears that your reverse proxy set up is broken" error.
+      proxy_pass          https://backend;
+      proxy_read_timeout  90;
+
+      # proxy_redirect      http://localhost:8080 https://jenkins.domain.com;
+      proxy_redirect off;
+      proxy_ssl_session_reuse on;
+
+    }
+}
+
+
+upstream api80 {
+  server xxx.xxx.xxx.xxx:80;
+}
+
+server {
+    listen 80;
+    server_name api.example.io;
+    access_log            /var/log/nginx/api.yuanjin.io.access.log;
+
+    location / {
+
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+
+      # Fix the "It appears that your reverse proxy set up is broken" error.
+      proxy_pass          http://api80;
+      proxy_read_timeout  90;
+      proxy_redirect off;
+      proxy_ssl_session_reuse on;
+    }
+}
