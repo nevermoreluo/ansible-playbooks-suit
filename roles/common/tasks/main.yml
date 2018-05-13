@@ -1,0 +1,116 @@
+---
+# This role contains common plays that will run on all servers.
+
+- name: Init ulimit
+  shell: ulimit -n 1048576
+
+- name: Modify nofile limit for all users, both soft and hard
+  pam_limits:
+    domain: root
+    limit_type: hard
+    limit_item: nofile
+    value: 1048576
+  tags: ulimit
+
+- name: Modify nofile limit for all users, both soft and hard
+  pam_limits:
+    domain: root
+    limit_type: soft
+    limit_item: nofile
+    value: 1048576
+  tags: ulimit
+
+- name: Modify nofile limit for all users, both soft and hard
+  pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 1048576
+  tags: ulimit
+
+- name: Modify nofile limit for all users, both soft and hard
+  pam_limits:
+    domain: '*'
+    limit_type: soft
+    limit_item: nofile
+    value: 1048576
+  tags: ulimit
+
+- name: Set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: Set apt source list
+  copy: src=files/sources.list dest=/etc/apt/sources.list
+          owner=root group=root mode=0644
+  when: inventory_hostname in groups['c5game']
+  tags: test
+
+- name: Ensure ntp packages are installed
+  apt: 
+    update_cache: true
+    name: ntp
+    state: present
+  tags: ntp
+
+- name: Ensure NTP is running and enabled as configured.
+  service:
+    name: "{{ ntp_daemon }}"
+    state: started
+    enabled: yes
+  when: ntp_enabled
+
+- name: Ensure NTP is stopped and disabled as configured.
+  service:
+    name: "{{ ntp_daemon }}"
+    state: stopped
+    enabled: no
+  when: not ntp_enabled
+
+- name: Configure ntp file
+  template: 
+    src: ntp.conf.j2 
+    dest: /etc/ntp.conf
+  tags: ntp
+  notify: restart ntp
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+  tags: ssh_key
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+  tags: ssh_key
+
+#- name: add users
+#  user:
+#    name: "{{ item.user }}"
+#    state: present
+#    groups: "wheel"
+#    password: "{{ item.password }}"
+#    update_password: "on_create"
+#  with_items:
+#    - { user: 'never', password: 'nevermore' }
+#  tags: ssh_key
+
+- name: Set authorized key took from file
+  authorized_key:
+    user: "{{ item.user }}"
+    state: present
+    key: "{{ item.key_file }}"
+  with_items:
+    - { user: 'root', key_file: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}" }s
+  tags: ssh_key
+
+- name: set hostname
+  hostname: name={{ inventory_hostname }}
+  when: inventory_hostname is defined
+  tags: set_hostname
+

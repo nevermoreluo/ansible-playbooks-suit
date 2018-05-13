@@ -1,0 +1,17 @@
+---
+## This playbook deploys the whole application stack in our sites.
+
+- hosts: all
+  become: true
+  gather_facts: false
+  pre_tasks:
+    - name: Install python2 for Ansible
+      raw: bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qqy python-minimal)"
+      register: output
+      changed_when: output.stdout != ""
+  roles:
+  - common
+
+- hosts: node
+  roles:
+    - { role: 'nodeExporter', tags: 'nodeExporter' }
