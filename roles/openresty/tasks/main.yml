@@ -1,0 +1,32 @@
+
+- include_tasks: "package.yml"
+
+- name: Create openresty conf folder
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    mode: 0700
+  with_items:
+    - /etc/openresty/sites-available/
+    - /etc/openresty/conf
+
+- name: Set waf
+  copy:
+    src: waf
+    dest: /etc/openresty/conf
+    directory_mode: yes
+    force: no
+    mode: 0777
+
+
+- name: Set transparent openresty config
+  copy:
+    src: "{{ item.src_path }}"
+    dest: "{{ item.dest_path }}"
+    force: "{{ item.force }}"
+    backup: "{{ item.backup }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src_path: "nginx.conf", dest_path: "/etc/openresty/nginx.conf", force: yes, backup: yes, mode: u=rw,g=r,o=r }
+  notify: restart_openresty

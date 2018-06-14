@@ -106,7 +106,7 @@
     state: present
     key: "{{ item.key_file }}"
   with_items:
-    - { user: 'root', key_file: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}" }s
+    - { user: 'root', key_file: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}" }
   tags: ssh_key
 
 - name: set hostname

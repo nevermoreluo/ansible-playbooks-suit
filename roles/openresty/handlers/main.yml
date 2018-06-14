@@ -1,0 +1,5 @@
+---
+- name: restart_openresty
+  systemd:
+    name: openresty
+    state: reloaded

@@ -1,0 +1,52 @@
+
+- name: Check if openresty exists
+  stat:
+    path: /etc/init.d/openresty
+  register: openresty_status
+
+- name: Make sure openresty dependencies installed
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - libpcre3-dev
+    - libssl-dev
+    - perl
+    - make
+    - build-essential
+    - curl
+    - software-properties-common
+  when: not openresty_status.stat.exists
+
+- name: Add apt key of openresty
+  apt_key:
+    url: https://openresty.org/package/pubkey.gpg
+  when: not openresty_status.stat.exists
+
+- name: Add openresty apt repository
+  apt_repository:
+    repo: deb http://openresty.org/package/ubuntu {{ ansible_distribution_release }} main
+    filename: openresty
+    state: present
+  when: not openresty_status.stat.exists
+
+- name: Check if Nginx exists
+  stat:
+    path: /etc/init.d/nginx
+  register: nginx_status
+  when: not openresty_status.stat.exists
+
+- name: Disable nginx if exist
+  systemd:
+    name: nginx
+    enable: no
+    state: stopped
+  when: not openresty_status.stat.exists and nginx_status.stat.exists
+
+- name: Install Openresty
+  apt:
+    name: openresty
+    state: present
+    update_cache: yes
+  when: not openresty_status.stat.exists

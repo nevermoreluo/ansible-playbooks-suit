@@ -32,6 +32,12 @@ NodeExporter will install in /opt/prometheus_exporters
 Will start by `service prometheus-node-exporter start`
 
 
+### openresty
+nginx with lua module
+auto include ngx_lua_waf
+and disable nginx
+
+
 
 Also you can run it with docker,
 ```bash
