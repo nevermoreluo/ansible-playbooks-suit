@@ -1,0 +1,11 @@
+
+
+- name: pull image
+  docker_image:
+    name: "{{ item.name }}"
+    tag: "{{ item.tag }}"
+  with_items:
+    - { name: "prom/prometheus", tag: "latest" }
+    - { name: "prom/pushgateway", tag: "latest" }
+    - { name: "prom/alertmanager", tag: "latest" }
+    - { name: "metalmatze/alertmanager-bot", tag: "0.2" }

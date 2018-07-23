@@ -1,0 +1,10 @@
+
+route:
+  group_by: ['alertname']
+  receiver: 'tg-bot'
+
+receivers:
+  - name: 'tg-bot'
+    webhook_configs:
+    - send_resolved: true
+      url: 'http://{{ ansible_host }}:{{ prometheus_telegram_port }}'

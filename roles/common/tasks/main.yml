@@ -40,12 +40,6 @@
   timezone:
     name: "{{ ntp_timezone }}"
 
-- name: Set apt source list
-  copy: src=files/sources.list dest=/etc/apt/sources.list
-          owner=root group=root mode=0644
-  when: inventory_hostname in groups['c5game']
-  tags: test
-
 - name: Ensure ntp packages are installed
   apt: 
     update_cache: true
@@ -114,3 +108,7 @@
   when: inventory_hostname is defined
   tags: set_hostname
 
+- name: Ensure the system locale is configured
+  locale_gen:
+    name: en_US.UTF-8
+    state: present

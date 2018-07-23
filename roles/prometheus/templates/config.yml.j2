@@ -1,0 +1,26 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 30s
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - '{{ ansible_host }}:{{ prometheus_alertmanager_port }}'
+
+rule_files:
+  - 'rules.yml'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:{{ prometheus_port }}']
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['{{ ansible_host }}:{{ prometheus_pushgateway_port }}']
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['216.200.116.156:7999', '173.82.232.118:7999', '202.144.195.82:7999', '173.82.232.118:7999']

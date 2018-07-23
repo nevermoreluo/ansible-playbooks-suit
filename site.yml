@@ -16,3 +16,8 @@
   roles:
     - { role: 'nodeExporter', tags: 'nodeExporter' }
     - { role: 'openresty', tags: 'openresty' }
+
+- hosts: monitor
+  roles:
+    - { role: 'docker', tags: 'docker' }
+    - { role: 'prometheus', tags: 'prometheus' }

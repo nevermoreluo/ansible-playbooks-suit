@@ -1,0 +1,16 @@
+---
+prometheus_data_dir: "/data/prometheus"
+prometheus_config_path: "{{ prometheus_data_dir }}/config.yml"
+prometheus_rules_path: "{{ prometheus_data_dir }}/rules.yml"
+prometheus_alertmanager_path: "{{ prometheus_data_dir }}/alertmanager_config.yml"
+prometheus_telegram_dir: "{{ prometheus_data_dir }}/tg_bot"
+
+
+prometheus_port: 9090
+prometheus_pushgateway_port: 9091
+prometheus_alertmanager_port: 9093
+prometheus_telegram_port: 8080
+
+
+prometheus_tg_id: "your_tg_user_id"
+prometheus_tg_bot_token: "your_tg_bot_token"

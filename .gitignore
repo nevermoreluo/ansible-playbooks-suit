@@ -107,3 +107,6 @@ site.retry
 
 .idea/*
 .vscode/*
+
+inventory
+

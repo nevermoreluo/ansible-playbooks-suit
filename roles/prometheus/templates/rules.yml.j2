@@ -1,0 +1,21 @@
+groups:
+- name: node
+  rules:
+  - alert: server_status
+    expr: sum(status{job="mon",label="server"}) by (address)==3
+    for: 1m
+    annotations:
+      summary: "{{ '{{' }} $labels.address {{ '}}' }} get error"
+
+  - alert: server_up
+    expr: up{job="node_exporter"}==0
+    for: 5m
+    annotations:
+      summary: "Instance {{ '{{' }} $labels.instance {{ '}}' }} is down."
+
+  - alert: disk_space_warnning
+    expr: ((node_filesystem_size{mountpoint="/"} - node_filesystem_free{mountpoint="/"} ) / node_filesystem_size{mountpoint="/"} * 100) > 75
+    for: 10m
+    annotations:
+      summary: "{{ '{{' }}$labels.instance{{ '}}' }}: Low data disk space"
+      description: "{{ '{{' }}$labels.instance{{ '}}' }}: Data disk usage is above 75% (current value is: {{ '{{' }} $value {{ '}}' }})"
